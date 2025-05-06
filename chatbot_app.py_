@@ -1,0 +1,42 @@
+import streamlit as st
+import joblib
+
+# Load the model and vectorizer
+model = joblib.load("emotion_model.pkl")
+vectorizer = joblib.load("vectorizer.pkl")
+
+# Function to generate responses based on emotion
+def generate_response(emotion):
+    responses = {
+        "joy": "Glad you're feeling happy! 😊",
+        "sadness": "I'm here if you want to talk. 😢",
+        "anger": "Take a deep breath... things will get better. 😡",
+        "fear": "There's nothing to fear, I'm with you. 😨",
+        "love": "Love is the most beautiful feeling. ❤",
+        "surprise": "Wow! That sounds surprising! 😮"
+    }
+    return responses.get(emotion, "I'm not sure how you're feeling... can you explain more?")
+
+# Page setup
+st.set_page_config(page_title="Emotion Detector", page_icon="💬")
+st.title("💬 Emotion-Aware Chatbot")
+st.markdown("Type something you're feeling below and get a predicted emotion and a friendly response:")
+
+# User input
+user_input = st.text_input("Write something:")
+
+# If user provides input
+if user_input:
+    # Clean and vectorize the input
+    clean_input = user_input.lower()
+    vectorized_input = vectorizer.transform([clean_input])
+    
+    # Predict emotion
+    predicted_emotion = model.predict(vectorized_input)[0]
+    
+    # Display result
+    st.subheader("🤖 Predicted Emotion:")
+    st.success(predicted_emotion)
+
+    st.subheader("💬 Response:")
+    st.info(generate_response(predicted_emotion))
